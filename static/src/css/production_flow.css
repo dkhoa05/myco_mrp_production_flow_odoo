@@ -1,0 +1,292 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   MyCo Production Flow — tab UI styles
+   Tất cả style SCOPED dưới `.o_myco_production_flow` để KHÔNG ảnh hưởng
+   list/tab gốc của Odoo (table, td, th, badge, …).
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Wrapper field widget */
+.o_field_production_flow_tab {
+    flex: 1 1 100%;
+    width: 100%;
+    padding: 0;
+}
+.o_field_production_flow_tab > .o_myco_production_flow {
+    width: 100%;
+}
+
+/* Root */
+.o_myco_production_flow {
+    font-size: 13px;
+    color: #212529;
+}
+
+/* ── Thời gian tính lương Quản lý ──────────────────────────────────────── */
+.o_myco_flow_manager_time_bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #f0f4ff;
+    border-bottom: 1px solid #c7d3f5;
+    gap: 12px;
+}
+.o_myco_flow_manager_time_label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c3e7a;
+}
+.o_myco_flow_manager_time_hint {
+    font-weight: 400;
+    font-size: 11.5px;
+    color: #6c757d;
+}
+.o_myco_flow_manager_time_value {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+    color: #1a237e;
+    min-width: 120px;
+    justify-content: flex-end;
+}
+.o_myco_flow_manager_time_value.is-running {
+    color: #0369a1;
+}
+.o_myco_flow_manager_time_value.is-done {
+    color: #15803d;
+}
+
+/* ── Live timer dot (giống indicator Odoo) ──────────────────────────────── */
+.o_myco_timer_dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #0ea5e9;
+    animation: o_myco_pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes o_myco_pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.75); }
+}
+
+/* ── Timer cell (cột Actual khi progress) ───────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_timer_cell {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: #0369a1;
+    letter-spacing: 0.3px;
+}
+
+/* ── Row highlight khi WO đang progress ─────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_row_running {
+    background-color: #f0f9ff !important;
+}
+.o_myco_production_flow .o_myco_flow_row_running:hover td {
+    background-color: #e0f2fe !important;
+}
+
+/* ── Section header ─────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_section_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 12px;
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+.o_myco_production_flow .o_myco_flow_section_header .o_myco_flow_summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #495057;
+}
+.o_myco_production_flow .o_myco_flow_section_header .o_myco_flow_summary b {
+    color: #212529;
+}
+
+/* ── Alert banner ───────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_alert {
+    margin: 10px 12px 4px 12px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.o_myco_production_flow .o_myco_flow_alert .fa { font-size: 14px; }
+.o_myco_production_flow .o_myco_flow_alert.alert-warning {
+    background: #fff3cd; color: #664d03; border: 1px solid #ffecb5;
+}
+.o_myco_production_flow .o_myco_flow_alert.alert-info {
+    background: #cff4fc; color: #055160; border: 1px solid #b6effb;
+}
+.o_myco_production_flow .o_myco_flow_alert.alert-success {
+    background: #d1e7dd; color: #0a3622; border: 1px solid #badbcc;
+}
+
+/* ── Table ──────────────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+.o_myco_production_flow .o_myco_flow_table thead th {
+    font-size: 11.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #6c757d;
+    letter-spacing: 0.3px;
+    border-bottom: 1px solid #dee2e6;
+    padding: 8px 8px;
+    background: #ffffff;
+    text-align: left;
+    white-space: nowrap;
+}
+.o_myco_production_flow .o_myco_flow_table tbody td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f1f3f5;
+    vertical-align: middle;
+}
+.o_myco_production_flow .o_myco_flow_table tbody tr:hover td {
+    background: #f8f9fa;
+}
+
+/* Indentation cột Operation của WO row */
+.o_myco_production_flow .o_myco_flow_wo_op { padding-left: 32px !important; }
+
+/* ── Group row (Child MO header) ────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_group_row td {
+    background: #f5f7fa !important;
+    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+    padding: 8px 8px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.o_myco_production_flow .o_myco_flow_group_row:hover td {
+    background: #eef1f5 !important;
+}
+.o_myco_production_flow .o_myco_flow_group_caret {
+    color: #6c757d;
+    font-size: 11px;
+    width: 12px;
+    display: inline-block;
+    text-align: center;
+}
+.o_myco_production_flow .o_myco_flow_group_mo {
+    font-weight: 600;
+    color: #0d6efd;
+    margin-right: 6px;
+}
+.o_myco_production_flow .o_myco_flow_group_product {
+    font-weight: 500;
+    margin-right: 6px;
+}
+.o_myco_production_flow .o_myco_flow_group_qty {
+    color: #6c757d;
+    margin-right: 8px;
+}
+
+/* ── Badges (state) ─────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_badge {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.5;
+    border-radius: 4px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.o_myco_production_flow .o_myco_flow_badge.deco-info     { background:#cff4fc; color:#055160; }
+.o_myco_production_flow .o_myco_flow_badge.deco-success  { background:#d1e7dd; color:#0a3622; }
+.o_myco_production_flow .o_myco_flow_badge.deco-danger   { background:#f8d7da; color:#58151c; }
+.o_myco_production_flow .o_myco_flow_badge.deco-warning  { background:#fff3cd; color:#664d03; }
+.o_myco_production_flow .o_myco_flow_badge.deco-muted    { background:#e9ecef; color:#495057; }
+.o_myco_production_flow .o_myco_flow_badge.deco-primary  { background:#cfe2ff; color:#052c65; }
+
+/* ── Action cell ────────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.o_myco_production_flow .o_myco_flow_actions .btn {
+    line-height: 1;
+}
+
+/* Small button - Mở */
+.o_myco_production_flow .o_myco_flow_open_btn {
+    font-size: 11.5px;
+    padding: 2px 8px;
+    line-height: 1.4;
+}
+
+/* ── Empty state ────────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 16px;
+    color: #6c757d;
+    text-align: center;
+}
+.o_myco_production_flow .o_myco_flow_empty .fa { font-size: 32px; margin-bottom: 12px; }
+.o_myco_production_flow .o_myco_flow_empty .o_myco_flow_empty_title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #495057;
+    margin-bottom: 4px;
+}
+.o_myco_production_flow .o_myco_flow_empty .o_myco_flow_empty_sub {
+    font-size: 12.5px;
+    max-width: 520px;
+}
+
+/* ── Progress bar ───────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_progress {
+    width: 100%;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+}
+.o_myco_production_flow .o_myco_flow_progress > span {
+    display: block;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+.o_myco_production_flow .o_myco_flow_progress.is-zero    > span { background:#adb5bd; }
+.o_myco_production_flow .o_myco_flow_progress.is-running > span { background:#0dcaf0; }
+.o_myco_production_flow .o_myco_flow_progress.is-done    > span { background:#198754; }
+.o_myco_production_flow .o_myco_flow_progress_label {
+    font-size: 12px;
+    color: #495057;
+    vertical-align: middle;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────── */
+.o_myco_production_flow .o_myco_flow_table_wrap {
+    overflow-x: auto;
+}
+@media (max-width: 768px) {
+    .o_myco_flow_manager_time_bar { flex-direction: column; align-items: flex-start; }
+    .o_myco_production_flow .o_myco_flow_table thead th,
+    .o_myco_production_flow .o_myco_flow_table tbody td {
+        white-space: nowrap;
+    }
+}

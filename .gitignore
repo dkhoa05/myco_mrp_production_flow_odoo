@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.zip
+*.log
+_backup/
+.claude/settings.local.json

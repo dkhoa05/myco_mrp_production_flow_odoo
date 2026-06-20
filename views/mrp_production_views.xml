@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mrp_production_form_view_production_flow" model="ir.ui.view">
+        <field name="name">mrp.production.form.production_flow</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+            <!-- myco_has_child_mos dùng để ẩn/hiện tab khi MO không có MO con -->
+            <xpath expr="//sheet/field[@name='reservation_state']" position="before">
+                <field name="myco_has_child_mos" invisible="1"/>
+            </xpath>
+            <!-- Tab Production Flow — chỉ hiện khi là Master MO (có MO con native) -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Production Flow" name="production_flow" invisible="not myco_has_child_mos">
+                    <field name="myco_child_mo_count" widget="production_flow_tab" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
