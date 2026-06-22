@@ -146,7 +146,10 @@ class MrpWorkorder(models.Model):
         workorders = self.production_id.workorder_ids.sorted(
             lambda wo: (wo.sequence, wo.id)
         )
-        for wo in workorders[workorders.ids.index(self.id) + 1:]:
+        ids = workorders.ids
+        if self.id not in ids:
+            return self.env["mrp.workorder"]
+        for wo in workorders[ids.index(self.id) + 1:]:
             if wo.state in WO_TERMINAL_STATES:
                 continue
             if wo.state == WO_RUNNING_STATE:
