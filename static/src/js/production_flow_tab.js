@@ -49,14 +49,14 @@ function formatDuration(minutes, showSeconds) {
  */
 function getStatusClass(state, isRunning = true) {
     // isRunning phải EXPLICITLY false (không phải undefined) mới là Paused
-    if (state === "progress" && isRunning === false) return "deco-warning";   // Paused
+    if (state === "progress" && isRunning === false) return "text-bg-warning";   // Paused
     return {
-        progress: "deco-info",
-        done:     "deco-success",
-        cancel:   "deco-danger",
-        blocked:  "deco-warning",
-        ready:    "deco-muted",
-    }[state] || "deco-muted";
+        progress: "text-bg-info",
+        done:     "text-bg-success",
+        cancel:   "text-bg-danger",
+        blocked:  "text-bg-warning",
+        ready:    "text-bg-secondary",
+    }[state] || "text-bg-secondary";
 }
 
 function getStatusLabel(state, isRunning = true) {
@@ -72,13 +72,13 @@ function getStatusLabel(state, isRunning = true) {
 
 function getMoStatusClass(state) {
     return {
-        draft:     "deco-muted",
-        confirmed: "deco-info",
-        progress:  "deco-primary",
-        to_close:  "deco-warning",
-        done:      "deco-success",
-        cancel:    "deco-danger",
-    }[state] || "deco-muted";
+        draft:     "text-bg-secondary",
+        confirmed: "text-bg-info",
+        progress:  "text-bg-primary",
+        to_close:  "text-bg-warning",
+        done:      "text-bg-success",
+        cancel:    "text-bg-danger",
+    }[state] || "text-bg-secondary";
 }
 
 function getMoStatusLabel(state) {
@@ -371,9 +371,9 @@ export class ProductionFlowTab extends Component {
     get progress() {
         const pct      = Math.max(0, Math.min(100, this.state.masterInfo.flow_progress || 0));
         const flowState = this.state.masterInfo.flow_state;
-        let cls = "is-zero";
-        if (pct >= 100 || flowState === "done")       cls = "is-done";
-        else if (pct > 0 || flowState === "running")  cls = "is-running";
+        let cls = "bg-secondary";
+        if (pct >= 100 || flowState === "done")       cls = "bg-success";
+        else if (pct > 0 || flowState === "running")  cls = "bg-info";
         return { pct, cls, label: `${pct.toFixed(0)}%` };
     }
 

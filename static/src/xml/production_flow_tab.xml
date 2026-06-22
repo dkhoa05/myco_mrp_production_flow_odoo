@@ -4,6 +4,8 @@
   Được đăng ký trong JS với: registry.category("fields").add("production_flow_tab", …)
   Gắn vào form mrp.production qua: widget="production_flow_tab" trong view XML.
 
+  Trình bày dùng Bootstrap (bundle sẵn của Odoo) — không tự chế CSS.
+
   Data source: action_get_production_flow_data() — single RPC.
   Payload keys: master.{flow_state, flow_progress}, children[].{product, qty, uom, workorders[]},
                 master_workorders[].{workcenter, flow_role, duration, duration_expected}
@@ -15,9 +17,9 @@
 
       <!-- ── 1. Loading spinner ────────────────────────────────────────────── -->
       <t t-if="state.loading">
-        <div class="o_myco_flow_empty">
+        <div class="d-flex flex-column align-items-center justify-content-center text-muted p-5">
           <i class="fa fa-spinner fa-spin fa-2x"/>
-          <div class="o_myco_flow_empty_title mt-2">Loading...</div>
+          <div class="fw-semibold mt-2">Loading...</div>
         </div>
       </t>
 
@@ -25,7 +27,7 @@
 
         <!-- ── 2. Alert banner ───────────────────────────────────────────────── -->
         <t t-if="alert">
-          <div t-attf-class="o_myco_flow_alert alert-{{ alert.type }}">
+          <div t-attf-class="alert alert-{{ alert.type }} d-flex align-items-center gap-2 m-2" role="alert">
             <i t-attf-class="fa {{ alert.icon }}"/>
             <span t-esc="alert.message"/>
           </div>
@@ -34,39 +36,40 @@
         <!-- ── 3. Thanh thời gian làm việc Quản lý ──────────────────────────── -->
         <!-- Chỉ hiện khi WO Quản lý đã được start (state = progress hoặc done). -->
         <t t-if="managerParallelTime.hasData">
-          <div class="o_myco_flow_manager_time_bar">
-            <div class="o_myco_flow_manager_time_label">
-              <i class="fa fa-user-o me-1"/>
+          <div class="d-flex align-items-center justify-content-between gap-3 p-2 border-bottom bg-light">
+            <div class="d-flex align-items-center gap-1 fw-semibold">
+              <i class="fa fa-user-o"/>
               <span>Thời gian làm việc Quản lý</span>
             </div>
-            <div t-attf-class="o_myco_flow_manager_time_value {{ managerParallelTime.isRunning ? 'is-running' : 'is-done' }}">
-              <span t-if="managerParallelTime.isRunning" class="o_myco_timer_dot"/>
-              <i t-if="!managerParallelTime.isRunning" class="fa fa-check-circle text-success me-1"/>
-              <span class="o_myco_timer_value" t-esc="formatDuration(managerParallelTime.minutes, true)"/>
+            <div t-attf-class="d-flex align-items-center gap-2 fs-5 fw-bold font-monospace {{ managerParallelTime.isRunning ? 'text-primary' : 'text-success' }}">
+              <span t-if="managerParallelTime.isRunning" class="spinner-grow spinner-grow-sm"/>
+              <i t-if="!managerParallelTime.isRunning" class="fa fa-check-circle text-success"/>
+              <span t-esc="formatDuration(managerParallelTime.minutes, true)"/>
             </div>
           </div>
         </t>
 
         <!-- ── 4. Section header: tóm tắt + progress bar + nút Refresh ─────── -->
-        <div class="o_myco_flow_section_header">
-          <div class="o_myco_flow_summary">
-            <b t-esc="summary.total"/>
+        <div class="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
+          <div class="d-flex align-items-center gap-2 small text-muted">
+            <b class="text-body" t-esc="summary.total"/>
             <span>MO con</span>
             <t t-if="summary.running > 0">
-              <span class="o_myco_flow_badge deco-primary">
+              <span class="badge text-bg-primary">
                 <t t-esc="summary.running"/> đang chạy
               </span>
             </t>
             <t t-if="summary.done > 0">
-              <span class="o_myco_flow_badge deco-success">
+              <span class="badge text-bg-success">
                 <t t-esc="summary.done"/> Done
               </span>
             </t>
-            <span class="ms-3">
-              <span t-attf-class="o_myco_flow_progress {{ progress.cls }}" style="width:120px">
-                <span t-attf-style="width: {{ progress.pct }}%"/>
-              </span>
-              <span class="o_myco_flow_progress_label" t-esc="progress.label"/>
+            <span class="d-flex align-items-center gap-2 ms-3">
+              <div class="progress" style="width:120px;height:6px">
+                <div t-attf-class="progress-bar {{ progress.cls }}"
+                     t-attf-style="width: {{ progress.pct }}%" role="progressbar"/>
+              </div>
+              <span t-esc="progress.label"/>
             </span>
           </div>
           <button class="btn btn-light btn-sm border"
@@ -80,8 +83,8 @@
 
         <!-- ── 5. Bảng danh sách Child MO và Work Orders ─────────────────────── -->
         <t t-if="state.childMos.length > 0">
-          <div class="o_myco_flow_table_wrap">
-            <table class="o_myco_flow_table">
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
               <colgroup>
                 <col style="width:30%"/>
                 <col style="width:22%"/>
@@ -102,16 +105,16 @@
                 <t t-foreach="state.childMos" t-as="mo" t-key="mo.id">
 
                   <!-- Group row: header mỗi Child MO -->
-                  <tr class="o_myco_flow_group_row" t-on-click="() => this.toggleMo(mo.id)">
+                  <tr class="table-light" style="cursor:pointer" t-on-click="() => this.toggleMo(mo.id)">
                     <td colspan="5">
-                      <i t-attf-class="o_myco_flow_group_caret fa {{ state.expanded[mo.id] ? 'fa-caret-down' : 'fa-caret-right' }}"/>
-                      <span class="o_myco_flow_group_mo ms-1" t-esc="mo.name"/>
+                      <i t-attf-class="fa {{ state.expanded[mo.id] ? 'fa-caret-down' : 'fa-caret-right' }} text-muted"/>
+                      <span class="fw-semibold text-primary ms-1" t-esc="mo.name"/>
                       <!-- payload.children[].product là string (display_name) -->
-                      <span class="o_myco_flow_group_product" t-esc="mo.product"/>
-                      <span class="o_myco_flow_group_qty">(<t t-esc="mo.qty"/> <t t-esc="mo.uom"/>)</span>
-                      <span t-attf-class="o_myco_flow_badge {{ getMoStatusClass(mo.state) }}"
+                      <span class="ms-2" t-esc="mo.product"/>
+                      <span class="text-muted ms-2">(<t t-esc="mo.qty"/> <t t-esc="mo.uom"/>)</span>
+                      <span t-attf-class="badge ms-2 {{ getMoStatusClass(mo.state) }}"
                             t-esc="getMoStatusLabel(mo.state)"/>
-                      <button class="btn btn-light border o_myco_flow_open_btn ms-1"
+                      <button class="btn btn-light btn-sm border ms-2"
                               t-on-click.stop="() => this.openMo(mo.id)">
                         <i class="fa fa-external-link me-1"/>Mở
                       </button>
@@ -131,19 +134,19 @@
                       <t t-foreach="mo.workorders" t-as="wo" t-key="wo.id">
                         <!-- is_running !== false: đang chạy thực sự (true) hoặc server cũ (undefined → backward-compat) -->
                         <!-- is_running === false: đã bị Pause → không highlight, không dot -->
-                        <tr t-attf-class="{{ wo.state === 'progress' and wo.is_running !== false ? 'o_myco_flow_row_running' : '' }}">
-                          <td class="o_myco_flow_wo_op">
-                            <span t-if="wo.state === 'progress' and wo.is_running !== false" class="o_myco_timer_dot me-1"/>
+                        <tr t-attf-class="{{ wo.state === 'progress' and wo.is_running !== false ? 'table-info' : '' }}">
+                          <td class="ps-4">
+                            <span t-if="wo.state === 'progress' and wo.is_running !== false" class="spinner-grow spinner-grow-sm text-info me-1"/>
                             <t t-esc="wo.name"/>
                           </td>
                           <!-- payload workorder.workcenter là string -->
                           <td t-esc="wo.workcenter || ''"/>
                           <td t-esc="formatDuration(wo.duration_expected, false)"/>
-                          <td t-attf-class="{{ wo.state === 'progress' and wo.is_running !== false ? 'o_myco_flow_timer_cell' : '' }}">
+                          <td t-attf-class="{{ wo.state === 'progress' and wo.is_running !== false ? 'font-monospace fw-semibold text-info' : '' }}">
                             <t t-esc="formatDuration(getLiveWoDuration(wo), true)"/>
                           </td>
                           <td>
-                            <div class="o_myco_flow_actions">
+                            <div class="d-flex align-items-center gap-1">
                               <t t-if="canStartWo(wo)">
                                 <button class="btn btn-success btn-sm px-2"
                                         t-att-title="wo.state === 'progress' ? 'Resume' : 'Start'"
@@ -164,7 +167,7 @@
                                 </button>
                               </t>
                               <!-- Truyền is_running để badge hiện "Paused" thay "In Progress" khi bị pause -->
-                              <span t-attf-class="o_myco_flow_badge {{ getStatusClass(wo.state, wo.is_running) }}"
+                              <span t-attf-class="badge {{ getStatusClass(wo.state, wo.is_running) }}"
                                     t-esc="getStatusLabel(wo.state, wo.is_running)"/>
                             </div>
                           </td>
@@ -182,15 +185,15 @@
         <!-- ── 6. Bảng Công đoạn tổng (Gia công + Đóng gói) ─────────────────── -->
         <!-- assemblyWo / packingWo được lấy từ master_workorders theo flow_role.  -->
         <t t-if="state.masterInfo.assemblyWo or state.masterInfo.packingWo">
-          <div class="o_myco_flow_section_header" style="margin-top:4px">
-            <div class="o_myco_flow_summary">
-              <i class="fa fa-cogs me-1"/>
-              <b>Công đoạn tổng</b>
-              <span class="text-muted">(sau khi MO con hoàn thành)</span>
+          <div class="d-flex justify-content-between align-items-center p-2 border-bottom bg-light mt-1">
+            <div class="d-flex align-items-center gap-2 small text-muted">
+              <i class="fa fa-cogs"/>
+              <b class="text-body">Công đoạn tổng</b>
+              <span>(sau khi MO con hoàn thành)</span>
             </div>
           </div>
-          <div class="o_myco_flow_table_wrap">
-            <table class="o_myco_flow_table">
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
               <colgroup>
                 <col style="width:30%"/>
                 <col style="width:22%"/>
@@ -202,19 +205,19 @@
                 <!-- Row WO Gia công -->
                 <t t-if="state.masterInfo.assemblyWo">
                   <t t-set="awo" t-value="state.masterInfo.assemblyWo"/>
-                  <tr t-attf-class="{{ awo.state === 'progress' and awo.is_running !== false ? 'o_myco_flow_row_running' : '' }}">
-                    <td style="padding-left:12px">
-                      <span t-if="awo.state === 'progress' and awo.is_running !== false" class="o_myco_timer_dot me-1"/>
+                  <tr t-attf-class="{{ awo.state === 'progress' and awo.is_running !== false ? 'table-info' : '' }}">
+                    <td class="ps-3">
+                      <span t-if="awo.state === 'progress' and awo.is_running !== false" class="spinner-grow spinner-grow-sm text-info me-1"/>
                       <t t-esc="awo.name"/>
                     </td>
                     <!-- payload workorder.workcenter là string -->
                     <td t-esc="awo.workcenter || ''"/>
                     <td t-esc="formatDuration(awo.duration_expected, false)"/>
-                    <td t-attf-class="{{ awo.state === 'progress' and awo.is_running !== false ? 'o_myco_flow_timer_cell' : '' }}">
+                    <td t-attf-class="{{ awo.state === 'progress' and awo.is_running !== false ? 'font-monospace fw-semibold text-info' : '' }}">
                       <t t-esc="formatDuration(getLiveWoDuration(awo), true)"/>
                     </td>
                     <td>
-                      <span t-attf-class="o_myco_flow_badge {{ getStatusClass(awo.state, awo.is_running) }}"
+                      <span t-attf-class="badge {{ getStatusClass(awo.state, awo.is_running) }}"
                             t-esc="getStatusLabel(awo.state, awo.is_running)"/>
                     </td>
                   </tr>
@@ -222,18 +225,18 @@
                 <!-- Row WO Đóng gói -->
                 <t t-if="state.masterInfo.packingWo">
                   <t t-set="pwo" t-value="state.masterInfo.packingWo"/>
-                  <tr t-attf-class="{{ pwo.state === 'progress' and pwo.is_running !== false ? 'o_myco_flow_row_running' : '' }}">
-                    <td style="padding-left:12px">
-                      <span t-if="pwo.state === 'progress' and pwo.is_running !== false" class="o_myco_timer_dot me-1"/>
+                  <tr t-attf-class="{{ pwo.state === 'progress' and pwo.is_running !== false ? 'table-info' : '' }}">
+                    <td class="ps-3">
+                      <span t-if="pwo.state === 'progress' and pwo.is_running !== false" class="spinner-grow spinner-grow-sm text-info me-1"/>
                       <t t-esc="pwo.name"/>
                     </td>
                     <td t-esc="pwo.workcenter || ''"/>
                     <td t-esc="formatDuration(pwo.duration_expected, false)"/>
-                    <td t-attf-class="{{ pwo.state === 'progress' and pwo.is_running !== false ? 'o_myco_flow_timer_cell' : '' }}">
+                    <td t-attf-class="{{ pwo.state === 'progress' and pwo.is_running !== false ? 'font-monospace fw-semibold text-info' : '' }}">
                       <t t-esc="formatDuration(getLiveWoDuration(pwo), true)"/>
                     </td>
                     <td>
-                      <span t-attf-class="o_myco_flow_badge {{ getStatusClass(pwo.state, pwo.is_running) }}"
+                      <span t-attf-class="badge {{ getStatusClass(pwo.state, pwo.is_running) }}"
                             t-esc="getStatusLabel(pwo.state, pwo.is_running)"/>
                     </td>
                   </tr>
@@ -245,12 +248,12 @@
 
         <!-- ── 7. Empty state ────────────────────────────────────────────────── -->
         <t t-if="state.childMos.length === 0">
-          <div class="o_myco_flow_empty">
-            <i class="fa fa-sitemap fa-2x"/>
-            <div class="o_myco_flow_empty_title mt-2">
+          <div class="d-flex flex-column align-items-center justify-content-center text-center text-muted p-5">
+            <i class="fa fa-sitemap fa-2x mb-2"/>
+            <div class="fw-semibold fs-6 text-secondary">
               Không có MO con được sinh từ Overview/Reordering Rule
             </div>
-            <div class="o_myco_flow_empty_sub">
+            <div class="small" style="max-width:520px">
               Tab Production Flow chỉ hiển thị khi MO tổng có lệnh sản xuất con
               được Odoo tạo tự động (qua MTO/Manufacture route trong BoM).
             </div>
