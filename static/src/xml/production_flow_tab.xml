@@ -38,7 +38,6 @@
             <div class="o_myco_flow_manager_time_label">
               <i class="fa fa-user-o me-1"/>
               <span>Thời gian làm việc Quản lý</span>
-              <span class="o_myco_flow_manager_time_hint"></span>
             </div>
             <div t-attf-class="o_myco_flow_manager_time_value {{ managerParallelTime.isRunning ? 'is-running' : 'is-done' }}">
               <span t-if="managerParallelTime.isRunning" class="o_myco_timer_dot"/>

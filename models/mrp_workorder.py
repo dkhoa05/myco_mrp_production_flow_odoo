@@ -176,9 +176,9 @@ class MrpWorkorder(models.Model):
         if self.production_id.state in ("done", "cancel"):
             return False
         try:
-            self.with_context(
-                myco_skip_flow=True, myco_auto_start_reason=reason
-            ).button_start(raise_on_invalid_state=True)
+            self.with_context(myco_skip_flow=True).button_start(
+                raise_on_invalid_state=True
+            )
         except UserError:
             raise
         except Exception as err:  # noqa: BLE001

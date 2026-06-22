@@ -1,5 +1,5 @@
 {
-    "name": "MyCo2 MRP Production Flow v2",
+    "name": "MyCo MRP Production Flow",
     "version": "19.0.3.0.0",
     "category": "Manufacturing",
     "summary": "Thin MRP orchestration on native Source/Child MO flow.",

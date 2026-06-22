@@ -11,15 +11,4 @@
             </xpath>
         </field>
     </record>
-
-    <record id="mrp_workorder_form_add_flow_role" model="ir.ui.view">
-        <field name="name">mrp.workorder.form.add.flow.role</field>
-        <field name="model">mrp.workorder</field>
-        <field name="inherit_id" ref="mrp.mrp_production_workorder_form_view_inherit"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='workcenter_id']" position="after">
-                <field name="flow_role"/>
-            </xpath>
-        </field>
-    </record>
 </odoo>
