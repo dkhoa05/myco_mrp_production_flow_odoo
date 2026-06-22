@@ -12,8 +12,6 @@ _logger = logging.getLogger(__name__)
 class MrpProduction(models.Model):
     _inherit = "mrp.production"
 
-    myco_child_mo_count = fields.Integer(compute="_compute_myco_flow_metrics")
-    myco_has_child_mos = fields.Boolean(compute="_compute_myco_flow_metrics")
     myco_flow_state = fields.Selection(
         [
             ("empty", "No Child MO"),
@@ -38,8 +36,6 @@ class MrpProduction(models.Model):
         for production in self:
             children = production._myco_get_child_productions()
             workorders = production._myco_get_flow_workorders(children=children)
-            production.myco_child_mo_count = len(children)
-            production.myco_has_child_mos = bool(children)
 
             if not children and not workorders:
                 production.myco_flow_state = "empty"
