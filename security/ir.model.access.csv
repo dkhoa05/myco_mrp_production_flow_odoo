@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_myco_assembly_start_confirm,myco.assembly.start.confirm,model_myco_assembly_start_confirm,mrp.group_mrp_user,1,1,1,1

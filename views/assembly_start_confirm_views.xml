@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Wizard cảnh báo mềm khi Start Gia công lúc WO con chưa xong. -->
+    <record id="myco_assembly_start_confirm_form" model="ir.ui.view">
+        <field name="name">myco.assembly.start.confirm.form</field>
+        <field name="model">myco.assembly.start.confirm</field>
+        <field name="arch" type="xml">
+            <form string="Xác nhận công đoạn sản xuất">
+                <div class="alert alert-warning mb-2" role="alert">
+                    <i class="fa fa-exclamation-triangle me-1"/>
+                    <field name="message" nolabel="1" readonly="1" class="d-inline"/>
+                </div>
+                <field name="workorder_id" invisible="1"/>
+                <field name="mode" invisible="1"/>
+                <separator string="Công đoạn chưa hoàn tất"/>
+                <field name="pending_names" nolabel="1" readonly="1"/>
+                <footer>
+                    <button string="Tiếp tục" name="action_confirm" type="object"
+                            class="btn-primary"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

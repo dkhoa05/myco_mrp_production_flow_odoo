@@ -6,8 +6,10 @@
     "author": "MyCo",
     "depends": ["mrp"],
     "data": [
+        "security/ir.model.access.csv",
         "views/mrp_workorder_views.xml",
         "views/mrp_production_views.xml",
+        "views/assembly_start_confirm_views.xml",
     ],
     "assets": {
         "web.assets_backend": [

@@ -25,14 +25,6 @@
 
       <t t-else="">
 
-        <!-- ── 2. Alert banner ───────────────────────────────────────────────── -->
-        <t t-if="alert">
-          <div t-attf-class="alert alert-{{ alert.type }} d-flex align-items-center gap-2 m-2" role="alert">
-            <i t-attf-class="fa {{ alert.icon }}"/>
-            <span t-esc="alert.message"/>
-          </div>
-        </t>
-
         <!-- ── 3. Thanh thời gian làm việc Quản lý ──────────────────────────── -->
         <!-- Chỉ hiện khi WO Quản lý đã được start (state = progress hoặc done). -->
         <t t-if="managerParallelTime.hasData">
@@ -42,14 +34,13 @@
               <span>Thời gian làm việc Quản lý</span>
             </div>
             <div t-attf-class="d-flex align-items-center gap-2 fs-5 fw-bold font-monospace {{ managerParallelTime.isRunning ? 'text-primary' : 'text-success' }}">
-              <span t-if="managerParallelTime.isRunning" class="spinner-grow spinner-grow-sm"/>
               <i t-if="!managerParallelTime.isRunning" class="fa fa-check-circle text-success"/>
               <span t-esc="formatDuration(managerParallelTime.minutes, true)"/>
             </div>
           </div>
         </t>
 
-        <!-- ── 4. Section header: tóm tắt + progress bar + nút Refresh ─────── -->
+        <!-- ── 4. Section header: tóm tắt + progress bar ──────────────────── -->
         <div class="d-flex justify-content-between align-items-center p-2 border-bottom bg-light">
           <div class="d-flex align-items-center gap-2 small text-muted">
             <b class="text-body" t-esc="summary.total"/>
@@ -72,13 +63,6 @@
               <span t-esc="progress.label"/>
             </span>
           </div>
-          <button class="btn btn-light btn-sm border"
-                  t-att-disabled="state.refreshing"
-                  t-on-click="() => this.refresh()">
-            <i t-attf-class="fa {{ state.refreshing ? 'fa-spinner fa-spin' : 'fa-refresh' }} me-1"/>
-            <t t-if="state.refreshing">Refreshing...</t>
-            <t t-else="">Refresh</t>
-          </button>
         </div>
 
         <!-- ── 5. Bảng danh sách Child MO và Work Orders ─────────────────────── -->
@@ -136,7 +120,6 @@
                         <!-- is_running === false: đã bị Pause → không highlight, không dot -->
                         <tr t-attf-class="{{ wo.state === 'progress' and wo.is_running !== false ? 'table-info' : '' }}">
                           <td class="ps-4">
-                            <span t-if="wo.state === 'progress' and wo.is_running !== false" class="spinner-grow spinner-grow-sm text-info me-1"/>
                             <t t-esc="wo.name"/>
                           </td>
                           <!-- payload workorder.workcenter là string -->
@@ -207,7 +190,6 @@
                   <t t-set="awo" t-value="state.masterInfo.assemblyWo"/>
                   <tr t-attf-class="{{ awo.state === 'progress' and awo.is_running !== false ? 'table-info' : '' }}">
                     <td class="ps-3">
-                      <span t-if="awo.state === 'progress' and awo.is_running !== false" class="spinner-grow spinner-grow-sm text-info me-1"/>
                       <t t-esc="awo.name"/>
                     </td>
                     <!-- payload workorder.workcenter là string -->
@@ -227,7 +209,6 @@
                   <t t-set="pwo" t-value="state.masterInfo.packingWo"/>
                   <tr t-attf-class="{{ pwo.state === 'progress' and pwo.is_running !== false ? 'table-info' : '' }}">
                     <td class="ps-3">
-                      <span t-if="pwo.state === 'progress' and pwo.is_running !== false" class="spinner-grow spinner-grow-sm text-info me-1"/>
                       <t t-esc="pwo.name"/>
                     </td>
                     <td t-esc="pwo.workcenter || ''"/>

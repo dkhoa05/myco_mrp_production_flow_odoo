@@ -100,45 +100,6 @@ function canStartWo(wo)  { return wo.state === "ready" || (wo.state === "progres
 function canPauseWo(wo)  { return wo.state === "progress" && wo.is_running !== false; }
 function canFinishWo(wo) { return wo.state === "progress"; }
 
-/**
- * Banner alert theo flow_state của myco2:
- *   empty / ready → cần Start Quản lý
- *   running → đang chạy
- *   blocked → lỗi
- *   done → hoàn tất
- */
-function getOrchestrationAlert(flowState) {
-    if (!flowState || flowState === "empty" || flowState === "ready") {
-        return {
-            type: "warning",
-            icon: "fa-info-circle",
-            message: "Hãy Start công đoạn Quản lý trong tab Work Orders để bắt đầu flow.",
-        };
-    }
-    if (flowState === "running") {
-        return {
-            type: "info",
-            icon: "fa-cogs",
-            message: "Flow đang chạy. Các MO con sẽ được điều phối tự động.",
-        };
-    }
-    if (flowState === "blocked") {
-        return {
-            type: "warning",
-            icon: "fa-exclamation-triangle",
-            message: "Flow gặp lỗi. Kiểm tra log để biết WO con không Start được.",
-        };
-    }
-    if (flowState === "done") {
-        return {
-            type: "success",
-            icon: "fa-check-circle",
-            message: "Quy trình điều phối đã hoàn tất.",
-        };
-    }
-    return null;
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // OWL Component — ProductionFlowTab
 // ─────────────────────────────────────────────────────────────────────────────
@@ -155,7 +116,6 @@ export class ProductionFlowTab extends Component {
         this.state = useState({
             childMos:   [],
             loading:    true,
-            refreshing: false,
             expanded:   {},
             // masterInfo: { id, name, state, flow_state, flow_progress, child_count,
             //               managerWo, assemblyWo, packingWo }
@@ -327,17 +287,6 @@ export class ProductionFlowTab extends Component {
         await this._reloadRecord();
     }
 
-    async refresh() {
-        this.state.refreshing = true;
-        try {
-            await this._loadData({ showLoading: false });
-            await this._reloadRecord();
-            this.notification.add("Đã cập nhật Production Flow", { type: "info" });
-        } finally {
-            this.state.refreshing = false;
-        }
-    }
-
     toggleMo(moId) {
         this.state.expanded[moId] = !this.state.expanded[moId];
     }
@@ -363,10 +312,6 @@ export class ProductionFlowTab extends Component {
     canStartWo(wo)                            { return canStartWo(wo); }
     canPauseWo(wo)                            { return canPauseWo(wo); }
     canFinishWo(wo)                           { return canFinishWo(wo); }
-
-    get alert() {
-        return getOrchestrationAlert(this.state.masterInfo.flow_state);
-    }
 
     get progress() {
         const pct      = Math.max(0, Math.min(100, this.state.masterInfo.flow_progress || 0));
