@@ -1,20 +1,32 @@
 /** @odoo-module **/
 
 /**
- * Production Flow Tab — widget field hiển thị dashboard MO con của Master MO.
+ * Production Flow Tab — widget field (chỉ HIỂN THỊ + điều khiển) dashboard MO con
+ * của Master MO. Mọi orchestration tự động nằm ở PYTHON (models/mrp_workorder.py +
+ * mrp_production.py); file này chỉ vẽ trạng thái và bấm nút Start/Pause/Done.
  *
- * Luồng tự động:
+ * Luồng tự động (do server quyết, widget chỉ phản ánh):
  *   1. Start WO "Quản lý" → auto-start WO đầu của từng Child MO (song song)
  *   2. WO trong Child MO chạy tuần tự
  *   3. Tất cả Child WO Done → auto-start "Gia công"
  *   4. Gia công Done → auto-start "Đóng gói"
  *   5. Đóng gói Done → auto-finish "Quản lý"
  *
- * Data source: action_get_production_flow_data() — single RPC, trả về toàn bộ payload.
+ * MAP STEP → HÀM trong file (biến chính: state, tickState):
+ *   • Tải dữ liệu : setup()/onWillStart → _loadData() gọi RPC
+ *                   action_get_production_flow_data() → đổ vào state.masterInfo
+ *                   (managerWo/assemblyWo/packingWo) + state.childMos.
+ *   • Timer live  : _startTicker()/_stopTicker() chạy setInterval cập nhật
+ *                   tickState.elapsed; getLiveWoDuration()/managerParallelTime
+ *                   = duration server + elapsed khi WO đang chạy (is_running !== false).
+ *   • Nút bấm     : startWo()/pauseWo()/finishWo() gọi button_start/button_pending/
+ *                   action_mark_as_done trên mrp.workorder rồi _loadData()+_reloadRecord().
+ *   • Điều hướng  : openMo() mở form MO con; toggleMo() đóng/mở nhóm.
+ *   • Trình bày   : canStartWo/canPauseWo/canFinishWo + getStatus*, getMoStatus*,
+ *                   get progress/summary → class/label Bootstrap cho template.
  *
- * Timer live:
- *   - WO đang "progress": base (từ server, tính đến lúc load) + elapsed (client, mỗi giây)
- *   - WO không chạy: dùng duration tĩnh
+ * Data source: action_get_production_flow_data() — single RPC, trả về toàn bộ payload.
+ * Template: static/src/xml/production_flow_tab.xml (t-name "myco_mrp.ProductionFlowTab").
  */
 
 import { Component, useState, onWillStart, onWillDestroy } from "@odoo/owl";

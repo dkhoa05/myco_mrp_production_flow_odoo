@@ -1,13 +1,32 @@
-"""mrp.production — nửa Master MO của Production Flow.
+"""mrp.production — nửa MASTER MO của Production Flow (điều phối phía MO).
 
-Xem SƠ ĐỒ FLOW TỔNG ở models/mrp_workorder.py. File này chứa:
-  • _myco_auto_detect_flow_roles : gán flow_role theo TÊN WO khi confirm MO.
-  • Helper Source/Child MO       : _myco_get_child/source_productions, ...
-  • Đẩy flow (idempotent)         : _myco_advance_flow() gọi 3 bước có điều kiện:
-        _myco_start_assembly_when_children_done / _myco_start_packing_when_assembly_done
-        / _myco_finish_manager_when_done.
-  • Guard đóng MO                 : _myco_check_flow_done_before_close.
-  • RPC cho OWL widget            : action_get_production_flow_data.
+VAI TRÒ FILE: gán vai trò WO khi confirm, cung cấp helper Source/Child MO, và
+"đẩy" flow tiến lên mỗi khi một WO Done. SƠ ĐỒ FLOW TỔNG (đầy đủ) nằm ở
+models/mrp_workorder.py — đọc file đó trước; file này chỉ là các bước phía MO.
+
+HÀM CHÍNH theo bước flow (step → hàm → biến):
+  • action_confirm() → _myco_auto_detect_flow_roles()
+        Gán field `flow_role` theo TÊN WO (chuẩn hoá qua utils.normalize_vn):
+        'quan ly'→manager, 'gia cong'/'nhung'/'lanh'→assembly, 'dong goi'→packing.
+  • _myco_advance_flow()  [IDEMPOTENT — gọi sau mỗi WO Done từ
+        mrp_workorder._myco_dispatch_after_done()]. Tự kiểm điều kiện, chạy 3 bước:
+        (a) _myco_start_assembly_when_children_done() — MỌI WO con Done → start Gia công.
+        (b) _myco_start_packing_when_assembly_done()  — Gia công Done → start Đóng gói.
+        (c) _myco_finish_manager_when_done()          — MỌI WO khác Done → finish Quản lý
+            (cũng là lúc Đóng gói Done kéo theo Quản lý Done).
+  • button_mark_done() → _myco_check_flow_done_before_close()
+        GUARD CỨNG: chặn đóng MO tổng khi còn WO chưa Done.
+  • action_get_production_flow_data() — RPC single-payload cho OWL widget (prefetch
+        chống N+1 rồi build dict master/children/master_workorders).
+
+HELPER Source/Child (bọc quan hệ native, đều cần ensure_one):
+  • _myco_get_child_productions()  : MO con  (native _get_children()).
+  • _myco_get_source_productions() : MO tổng (native _get_sources()).
+  • _myco_get_flow_workorders()    : toàn bộ WO của MO + MO con (trừ cancel).
+  • _myco_get_workorder_by_role(r) : WO master đầu tiên theo role (sorted sequence,id).
+
+BIẾN/QUAN HỆ chính: production_group_id (gốc quan hệ Source/Child native),
+flow_role (mrp.workorder), hằng trạng thái ở const.py.
 """
 
 import logging
