@@ -116,8 +116,7 @@
                     </t>
                     <t t-else="">
                       <t t-foreach="mo.workorders" t-as="wo" t-key="wo.id">
-                        <!-- is_running !== false: đang chạy thực sự (true) hoặc server cũ (undefined → backward-compat) -->
-                        <!-- is_running === false: đã bị Pause → không highlight, không dot -->
+                        <!-- is_running !== false: đang chạy → highlight; === false: đã Pause → không highlight. -->
                         <tr t-attf-class="{{ wo.state === 'progress' and wo.is_running !== false ? 'table-info' : '' }}">
                           <td class="ps-4">
                             <t t-esc="wo.name"/>

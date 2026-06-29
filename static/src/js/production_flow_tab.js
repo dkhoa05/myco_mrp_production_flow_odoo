@@ -44,11 +44,10 @@ function formatDuration(minutes, showSeconds) {
 }
 
 /**
- * isRunning: truyền wo.is_running để phân biệt "progress đang chạy" vs "progress đã tạm dừng".
- * Mặc định true để backward-compat với MO-level state string.
+ * isRunning: phân biệt "progress đang chạy" vs "progress đã tạm dừng".
+ * Mặc định true (caller cấp MO chỉ có state string, không kèm cờ chạy).
  */
 function getStatusClass(state, isRunning = true) {
-    // isRunning phải EXPLICITLY false (không phải undefined) mới là Paused
     if (state === "progress" && isRunning === false) return "text-bg-warning";   // Paused
     return {
         progress: "text-bg-info",
@@ -60,7 +59,7 @@ function getStatusClass(state, isRunning = true) {
 }
 
 function getStatusLabel(state, isRunning = true) {
-    if (state === "progress" && isRunning === false) return "Paused";  // đã tạm dừng (phải explicit false)
+    if (state === "progress" && isRunning === false) return "Paused";  // đã tạm dừng
     return {
         progress: "In Progress",
         done:     "Done",
@@ -92,11 +91,9 @@ function getMoStatusLabel(state) {
     }[state] || state;
 }
 
-// WO có thể Start khi: ready, hoặc đang "progress" nhưng bị pause (is_running PHẢI === false, không phải undefined)
-// Dùng === false để tránh bug khi server cũ chưa trả is_running (undefined != false)
+// Start được khi: ready, hoặc đang "progress" nhưng đã pause (is_running === false → Resume).
 function canStartWo(wo)  { return wo.state === "ready" || (wo.state === "progress" && wo.is_running === false); }
-// Pause: progress và KHÔNG phải đang bị pause (is_running=false)
-// is_running=undefined (server cũ) → backward-compat: vẫn hiện Pause như trước
+// Pause được khi: đang "progress" và chưa pause (is_running !== false).
 function canPauseWo(wo)  { return wo.state === "progress" && wo.is_running !== false; }
 function canFinishWo(wo) { return wo.state === "progress"; }
 
@@ -137,9 +134,8 @@ export class ProductionFlowTab extends Component {
     _startTicker() {
         this._stopTicker();
 
-        // Tick khi có WO đang chạy thực sự:
-        //   is_running === true  → đang chạy (server mới trả is_running)
-        //   is_running === undefined → server cũ, fallback: tick nếu state=progress (backward-compat)
+        // Tick khi có WO đang chạy thực sự (state 'progress' và is_running !== false;
+        // is_running === false nghĩa là đã pause → không đếm).
         const info = this.state.masterInfo;
         const isWoTicking = (wo) => wo && wo.state === "progress" && wo.is_running !== false;
         const needsTimer =
@@ -216,10 +212,9 @@ export class ProductionFlowTab extends Component {
     // ── Tính thời gian hiển thị ──────────────────────────────────────────────
 
     /**
-     * duration từ server đã dùng get_duration() (bao gồm open time line lúc load).
-     * Client cộng thêm elapsed khi WO đang chạy thực sự.
-     * is_running === false  → WO bị Pause → duration tĩnh, không đếm thêm.
-     * is_running === undefined → server cũ, fallback: đếm theo state=progress (backward-compat).
+     * duration từ server đã dùng get_duration() (gồm open time line lúc load).
+     * Client cộng thêm elapsed khi WO đang chạy ('progress' và is_running !== false).
+     * is_running === false → WO bị Pause → duration tĩnh, không đếm thêm.
      */
     getLiveWoDuration(wo) {
         if (!wo) return 0;
